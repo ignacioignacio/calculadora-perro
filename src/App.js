@@ -242,7 +242,7 @@ export default function App() {
         <div className="bg-[#ede8dc] text-[#2a378d] min-h-screen font-sans flex flex-col p-4 sm:p-6 lg:p-8">
             <header className="w-full max-w-4xl mx-auto mb-8 flex justify-between items-center">
                 <h1 className="text-2xl sm:text-3xl text-left">¿Y cuánto me sale?</h1>
-                <img src="hhttps://i.imgur.com/3V0wUeJ.png" alt="Logo de la agencia" className="h-10 rounded" />
+                <img src="https://i.imgur.com/3V0wUeJ.png" alt="Perro Con Dos Colas" className="h-10 rounded" />
             </header>
             
             <main className="w-full max-w-4xl mx-auto flex-grow">
