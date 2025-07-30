@@ -2,10 +2,20 @@ import React, { useState, useMemo, useEffect } from 'react';
 
 // Main App Component
 export default function App() {
-    // --- SET BROWSER TAB TITLE ---
+    // --- SET BROWSER TAB TITLE AND FAVICON ---
     useEffect(() => {
         document.title = "Calculadora Perro";
-    }, []);
+
+        // Find existing favicon link or create a new one
+        let link = document.querySelector("link[rel~='icon']");
+        if (!link) {
+            link = document.createElement('link');
+            link.rel = 'icon';
+            document.getElementsByTagName('head')[0].appendChild(link);
+        }
+        // Set the href to your desired icon URL
+        link.href = 'https://i.imgur.com/3V0wUeJ.png';
+    }, []); // Empty dependency array ensures this runs only once
 
     // --- STATE MANAGEMENT ---
     const [path, setPath] = useState([]);
@@ -532,7 +542,7 @@ function StepView({ step, stepId, onSelect, path, budgetFlow, isEditing, initial
                     {isEditing ? (
                         <span className="px-4 font-bold">Actualizar</span>
                     ) : (
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="#ede8dc">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24" stroke="#ede8dc">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                         </svg>
                     )}
