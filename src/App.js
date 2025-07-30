@@ -14,7 +14,7 @@ export default function App() {
             document.getElementsByTagName('head')[0].appendChild(link);
         }
         // Set the href to your desired icon URL
-        link.href = 'https://i.imgur.com/3V0wUeJ.png';
+        link.href = 'https://i.imgur.com/C81V4YT.png';
     }, []); // Empty dependency array ensures this runs only once
 
     // --- STATE MANAGEMENT ---
@@ -279,15 +279,15 @@ export default function App() {
         <>
             <style>
                 {`
-                    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700&display=swap');
-                    .font-jakarta {
-                        font-family: 'Plus Jakarta Sans', sans-serif;
+                    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;700&display=swap');
+                    .font-dm-sans {
+                        font-family: 'DM Sans', sans-serif;
                     }
                 `}
             </style>
-            <div className="bg-[#ede8dc] text-[#2a378d] min-h-screen font-jakarta flex flex-col p-4 sm:p-6 lg:p-8">
+            <div className="bg-[#ede8dc] text-[#2a378d] min-h-screen font-dm-sans flex flex-col p-4 sm:p-6 lg:p-8">
                 <header className="w-full max-w-4xl mx-auto mb-4 flex justify-start items-center">
-                    <img src="https://i.imgur.com/3V0wUeJ.png" alt="Logo de Perro Con Dos Colas" className="h-10 rounded" />
+                    <img src="https://i.imgur.com/cRio5RG.png" alt="Logo de Perro Con Dos Colas" className="h-10 rounded" />
                 </header>
 
                 <main className="w-full max-w-4xl mx-auto flex-grow">
