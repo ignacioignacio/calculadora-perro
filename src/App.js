@@ -2,6 +2,11 @@ import React, { useState, useMemo, useEffect } from 'react';
 
 // Main App Component
 export default function App() {
+    // --- SET BROWSER TAB TITLE ---
+    useEffect(() => {
+        document.title = "Calculadora Perro";
+    }, []); // Empty dependency array ensures this runs only once when the component mounts.
+
     // --- STATE MANAGEMENT ---
     const [path, setPath] = useState([]);
     const [currentStepId, setCurrentStepId] = useState('start');
