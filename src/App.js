@@ -1,27 +1,22 @@
 import React, { useState, useMemo } from 'react';
 
-// Main App Component
 export default function App() {
-  // --- STATE MANAGEMENT ---
   const [path, setPath] = useState([]);
 
-  // --- PRICING CONFIGURATION ---
   const BASE_PRICES = {
-    snack: 370000,
-    storytelling: 910000,
+    snack: 400000,
+    storytelling: 1200000,
   };
 
-  // --- FLOW CONFIGURATION ---
   const budgetFlow = {
     start: {
       question: "Elegí el tipo de contenido",
       type: 'radio',
       options: {
-        snack: { label: "Snack Content", description: "Contenido rápido y directo.", next: "snack_cantidad" },
-        storytelling: { label: "Storytelling", description: "Historias más elaboradas.", next: "story_duracion" }
+        snack: { label: "Snack Content", next: "snack_cantidad" },
+        storytelling: { label: "Storytelling", next: "story_duracion" }
       }
     },
-
     snack_cantidad: {
       question: "Cantidad de piezas",
       type: 'radio',
@@ -32,7 +27,6 @@ export default function App() {
         snack_cantidad_4: { label: "4 piezas", percentage: -0.12, next: "snack_entrega" }
       }
     },
-
     snack_entrega: {
       question: "Formato de entrega",
       type: 'radio',
@@ -41,7 +35,6 @@ export default function App() {
         snack_entrega_periodos: { label: "Por períodos", percentage: 0, next: "snack_duracion" }
       }
     },
-
     snack_duracion: {
       question: "Duración",
       type: 'radio',
@@ -50,7 +43,6 @@ export default function App() {
         snack_duracion_30: { label: "30 segundos", percentage: 0, next: "snack_adapt_duracion" }
       }
     },
-
     snack_adapt_duracion: {
       question: "Adaptaciones de duración",
       type: 'radio',
@@ -60,7 +52,6 @@ export default function App() {
         snack_adapt_duracion_no: { label: "Sin adaptaciones", percentage: 0, next: "snack_formatos" }
       }
     },
-
     snack_formatos: {
       question: "Formatos",
       type: 'radio',
@@ -70,7 +61,6 @@ export default function App() {
         snack_formatos_16_9: { label: "16:9", percentage: 0, next: "snack_adapt_formato" }
       }
     },
-
     snack_adapt_formato: {
       question: "Adaptaciones de formato",
       type: 'radio',
@@ -80,7 +70,6 @@ export default function App() {
         snack_adapt_formato_no: { label: "Sin adaptaciones", percentage: 0, next: "snack_voz_off" }
       }
     },
-
     snack_voz_off: {
       question: "Voz en off (IA + música)",
       type: 'radio',
@@ -89,7 +78,6 @@ export default function App() {
         snack_voz_off_no: { label: "Sin voz en off", percentage: 0, next: "snack_entrenamiento" }
       }
     },
-
     snack_entrenamiento: {
       question: "Entrenamiento de producto",
       type: 'radio',
@@ -98,7 +86,6 @@ export default function App() {
         snack_entrenamiento_no: { label: "Sin entrenamiento", percentage: 0, next: "entrega_crudos" }
       }
     },
-
     story_duracion: {
       question: "Duración",
       type: 'radio',
@@ -107,7 +94,6 @@ export default function App() {
         story_duracion_30: { label: "30 segundos", percentage: 0, next: "story_adapt_duracion" }
       }
     },
-
     story_adapt_duracion: {
       question: "Adaptaciones de duración",
       type: 'radio',
@@ -117,7 +103,6 @@ export default function App() {
         story_adapt_duracion_no: { label: "Sin adaptaciones", percentage: 0, next: "story_formatos" }
       }
     },
-
     story_formatos: {
       question: "Formatos",
       type: 'radio',
@@ -127,7 +112,6 @@ export default function App() {
         story_formatos_16_9: { label: "16:9", percentage: 0, next: "story_adapt_formato" }
       }
     },
-
     story_adapt_formato: {
       question: "Adaptaciones de formato",
       type: 'radio',
@@ -137,17 +121,15 @@ export default function App() {
         story_adapt_formato_no: { label: "Sin adaptaciones", percentage: 0, next: "story_lipsync" }
       }
     },
-
     story_lipsync: {
-      question: "Lipsync (por actor)",
+      question: "Lipsync",
       type: 'radio',
       options: {
         story_lipsync_1: { label: "1 actor", percentage: 0.35, next: "story_entrenamiento" },
-        story_lipsync_2: { label: "2 actores", percentage: 0.35*2, next: "story_entrenamiento" },
+        story_lipsync_2: { label: "2 actores", percentage: 0.70, next: "story_entrenamiento" },
         story_lipsync_no: { label: "Sin lipsync", percentage: 0, next: "story_entrenamiento" }
       }
     },
-
     story_entrenamiento: {
       question: "Entrenamiento de producto",
       type: 'radio',
@@ -156,7 +138,6 @@ export default function App() {
         story_entrenamiento_no: { label: "Sin entrenamiento", percentage: 0, next: "story_actor_referencia" }
       }
     },
-
     story_actor_referencia: {
       question: "Actor referencia de movimientos",
       type: 'radio',
@@ -165,7 +146,6 @@ export default function App() {
         story_actor_referencia_no: { label: "Sin actor", percentage: 0, next: "entrega_crudos" }
       }
     },
-
     entrega_crudos: {
       question: "Entrega de tomas crudas",
       type: 'radio',
@@ -174,36 +154,31 @@ export default function App() {
         entrega_crudos_no: { label: "Sin crudos", percentage: 0, next: "guion_creativo" }
       }
     },
-
     guion_creativo: {
       question: "Guión creativo",
       type: 'radio',
       options: {
-        guion_creativo_si: { label: "Con guión creativo", fixedAmount: 50000, next: "concepto_creativo" },
+        guion_creativo_si: { label: "Con guión", fixedAmount: 50000, next: "concepto_creativo" },
         guion_creativo_no: { label: "Sin guión", percentage: 0, next: "concepto_creativo" }
       }
     },
-
     concepto_creativo: {
       question: "Concepto creativo",
       type: 'radio',
       options: {
-        concepto_creativo_si: { label: "Con concepto creativo", fixedAmount: 100000, next: "end" },
+        concepto_creativo_si: { label: "Con concepto", fixedAmount: 100000, next: "end" },
         concepto_creativo_no: { label: "Sin concepto", percentage: 0, next: "end" }
       }
     },
-
     end: { isFinal: true }
   };
 
-  // --- LOGIC & CALCULATIONS ---
   const currentStepId = useMemo(() => {
     if (path.length === 0) return 'start';
     const last = path[path.length - 1];
     const step = budgetFlow[last.stepId];
-    if (!step) return 'end';
-    const opt = step.options[last.selection];
-    return (opt && opt.next) || 'end';
+    const option = step?.options?.[last.selection];
+    return option?.next || 'end';
   }, [path]);
 
   const totalPrice = useMemo(() => {
@@ -213,12 +188,13 @@ export default function App() {
     let total = base;
     path.forEach(p => {
       if (p.stepId === 'start') return;
-      const opt = budgetFlow[p.stepId].options[p.selection];
-      if (opt.fixedAmount) total += opt.fixedAmount;
+      const opt = budgetFlow[p.stepId]?.options?.[p.selection];
+      if (!opt) return;
+      if (typeof opt.fixedAmount === 'number') total += opt.fixedAmount;
       if (typeof opt.percentage === 'number') total += base * opt.percentage;
     });
     return Math.floor(total);
   }, [path]);
 
-  // ... Renders and handlers unchanged
+  // ...handlers y render UI siguen como estaban
 }
