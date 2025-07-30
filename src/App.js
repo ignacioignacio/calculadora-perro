@@ -196,5 +196,64 @@ export default function App() {
     return Math.floor(total);
   }, [path]);
 
-  // ...handlers y render UI siguen como estaban
+  // --- HANDLERS ---
+  const handleSelection = (stepId, selection) => {
+    const newPath = [...path, { stepId, selection }];
+    setPath(newPath);
+  };
+
+  const handleJumpToStep = (stepIndex) => {
+    setPath(path.slice(0, stepIndex));
+  };
+
+  const handleReset = () => {
+    setPath([]);
+  };
+
+  // --- RENDER ---
+  const currentStep = budgetFlow[currentStepId];
+  return (
+    <div className="p-4">
+      <h1 className="text-2xl font-bold mb-4">¿Y cuánto me sale?</h1>
+
+      {currentStep && !currentStep.isFinal && (
+        <div className="mb-4">
+          <h2 className="text-xl mb-2">{currentStep.question}</h2>
+          <div className="flex flex-col gap-2">
+            {Object.entries(currentStep.options).map(([key, opt]) => (
+              <button
+                key={key}
+                onClick={() => handleSelection(currentStepId, key)}
+                className="px-4 py-2 rounded border border-gray-300 text-left hover:bg-gray-100"
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {currentStep && currentStep.isFinal && (
+        <div className="mt-6">
+          <h2 className="text-xl font-bold mb-2">Resumen</h2>
+          <ul className="list-disc list-inside">
+            {path.map((p, i) => {
+              const label = budgetFlow[p.stepId]?.options?.[p.selection]?.label;
+              return label ? <li key={i}>{label}</li> : null;
+            })}
+          </ul>
+          <button
+            onClick={handleReset}
+            className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          >
+            Empezar de nuevo
+          </button>
+        </div>
+      )}
+
+      <div className="mt-8 text-right text-xl">
+        {currentStep?.isFinal ? "Total Final" : "Total Parcial"}: ${new Intl.NumberFormat('es-AR').format(totalPrice)}
+      </div>
+    </div>
+  );
 }
