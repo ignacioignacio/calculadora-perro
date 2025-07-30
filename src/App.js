@@ -12,7 +12,7 @@ export default function App() {
     };
 
     // --- FLOW CONFIGURATION ---
-    // Each option now has its own percentage. A value of 0 means it adds no cost.
+    // Each option now has its own percentage or a fixed price.
     const budgetFlow = {
         start: {
             question: "Elegí el tipo de contenido",
@@ -84,12 +84,12 @@ export default function App() {
             }
         },
         snack_entrenamiento: {
-            question: "Entrenamiento de producto",
+            question: "Inclusión de producto",
             type: 'radio',
             options: {
-                snack_entrenamiento_1: { label: "Un entrenamiento de producto", percentage: 0.5, next: "entrega_crudos" },
-                snack_entrenamiento_2: { label: "Dos entrenamientos de producto", percentage: 0.1, next: "entrega_crudos" },
-                snack_entrenamiento_no: { label: "Sin entrenamiento de producto", percentage: 0, next: "entrega_crudos" }
+                snack_entrenamiento_1: { label: "Un producto", percentage: 0.5, next: "entrega_crudos" },
+                snack_entrenamiento_2: { label: "Dos productos", percentage: 0.1, next: "entrega_crudos" },
+                snack_entrenamiento_no: { label: "Sin inclusión de producto", percentage: 0, next: "entrega_crudos" }
             }
         },
         story_duracion: {
@@ -137,12 +137,12 @@ export default function App() {
             }
         },
         story_entrenamiento: {
-            question: "Entrenamiento de producto",
+            question: "Inclusión de producto",
             type: 'radio',
             options: {
-                story_entrenamiento_1: { label: "Un entrenamiento de producto", percentage: 0.1, next: "story_actor_referencia" },
-                story_entrenamiento_2: { label: "Dos entrenamientos de producto", percentage: 0.2, next: "story_actor_referencia" },
-                story_entrenamiento_no: { label: "Sin entrenamiento de producto", percentage: 0, next: "story_actor_referencia" }
+                story_entrenamiento_1: { label: "Un producto", percentage: 0.1, next: "story_actor_referencia" },
+                story_entrenamiento_2: { label: "Dos productos", percentage: 0.2, next: "story_actor_referencia" },
+                story_entrenamiento_no: { label: "Sin inclusión de producto", percentage: 0, next: "story_actor_referencia" }
             }
         },
         story_actor_referencia: {
@@ -165,16 +165,8 @@ export default function App() {
             question: "Guión creativo",
             type: 'radio',
             options: {
-                guion_creativo_si: { label: "Con guión creativo", percentage: 0.1, next: "concepto_creativo" },
+                guion_creativo_si: { label: "Con guión creativo", fixedPrice: { snack: 60000, storytelling: 150000 }, next: "end" },
                 guion_creativo_no: { label: "Sin guión creativo", percentage: 0, next: "end" }
-            }
-        },
-        concepto_creativo: {
-            question: "Concepto creativo",
-            type: 'radio',
-            options: {
-                concepto_creativo_si: { label: "Con concepto creativo", percentage: 0.03, next: "end" },
-                concepto_creativo_no: { label: "Sin concepto creativo", percentage: 0, next: "end" }
             }
         },
         end: {
@@ -215,6 +207,8 @@ export default function App() {
                 }
             } else if (selectedOption.percentage) {
                 total += basePrice * selectedOption.percentage;
+            } else if (selectedOption.fixedPrice) {
+                total += selectedOption.fixedPrice[firstChoiceKey] || 0;
             }
         });
 
@@ -239,7 +233,7 @@ export default function App() {
     return (
         <div className="bg-[#ede8dc] text-[#2a378d] min-h-screen font-sans flex flex-col p-4 sm:p-6 lg:p-8">
             <header className="w-full max-w-4xl mx-auto mb-8 flex justify-between items-center">
-                <h1 className="text-2xl sm:text-3xl text-left">¿Y cuánto me sale?</h1>
+                <h1 className="text-2xl sm:text-3xl text-left">Presupuestador Perro</h1>
                 <img src="https://i.imgur.com/3V0wUeJ.png" alt="Perro Con Dos Colas" className="h-10 rounded" />
             </header>
             
@@ -267,7 +261,6 @@ export default function App() {
                                     >
                                         {label}
                                     </button>
-                                    {index < path.length - 1 && <span className="text-[#2a378d]">&rarr;</span>}
                                 </React.Fragment>
                             );
                         })}
@@ -307,7 +300,7 @@ export default function App() {
                                 {(() => {
                                     const excludedItems = path
                                         .map(p => budgetFlow[p.stepId].options[p.selection])
-                                        .filter(opt => opt.label.startsWith("Sin "))
+                                        .filter(opt => opt && opt.label.startsWith("Sin "))
                                         .map(opt => opt.label.substring(4).toLowerCase());
 
                                     if (excludedItems.length > 0) {
@@ -321,7 +314,7 @@ export default function App() {
                                 })()}
                             </div>
                             <p className="italic mt-8 text-base text-[#2a378d]/80">
-                                Esta es una idea de presupuesto, los margenes pueden variar a la hora de ponerse en contacto definitivamente con nosotros. Tomelo como una guia, por favor.
+                                Presupuesto estimativo. Tomar como guía. Sólo válido para RRSS, consultar por presupuestos para TV.
                             </p>
                         </div>
                     )}
@@ -341,13 +334,19 @@ export default function App() {
             </footer>
             
             {/* Final Reset Button Area */}
-            {currentStep && currentStep.isFinal && (
+            {currentStep && currentStep.isFinal ? (
                  <div className="bg-[#2a378d] w-full p-4 -mx-4 -mb-4 sm:-mx-6 sm:-mb-6 lg:-mx-8 lg:-mb-8 mt-8">
                     <div className="w-full max-w-4xl mx-auto text-center">
                         <button onClick={handleReset} className="text-white text-lg hover:underline">
                             Empezar de nuevo
                         </button>
                     </div>
+                </div>
+            ) : (
+                <div className="w-full max-w-4xl mx-auto text-center mt-8">
+                     <button onClick={handleReset} className="text-[#2a378d] text-sm hover:underline">
+                        Limpiar elecciones
+                    </button>
                 </div>
             )}
         </div>
