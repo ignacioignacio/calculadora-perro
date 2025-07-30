@@ -214,7 +214,7 @@ export default function App() {
 
     return (
         <div className="bg-[#ede8dc] text-[#2a378d] min-h-screen font-sans flex flex-col p-4 sm:p-6 lg:p-8">
-            <header className="w-full max-w-4xl mx-auto mb-4 flex justify-end items-center">
+            <header className="w-full max-w-4xl mx-auto mb-4 flex justify-start items-center">
                 <img src="https://i.imgur.com/3V0wUeJ.png" alt="Perro Con Dos Colas" className="h-10 rounded" />
             </header>
             
@@ -281,16 +281,19 @@ export default function App() {
                                         const capitalized = excludedItems[0].charAt(0).toUpperCase() + excludedItems[0].slice(1);
                                         const rest = excludedItems.slice(1);
                                         return (
-                                            <p className="text-base mt-6">
-                                                <span>No incluye:</span> {[capitalized, ...rest].join(', ')}.
-                                            </p>
+                                            <>
+                                                <hr className="border-t border-[#2a378d]/50 my-4" />
+                                                <p className="text-lg mt-6">
+                                                    <span>No incluye:</span> {[capitalized, ...rest].join(', ')}.
+                                                </p>
+                                            </>
                                         );
                                     }
                                     return null;
                                 })()}
                             </div>
-                            <p className="italic mt-8 text-sm text-[#2a378d]/80">
-                                ✦ Presupuesto estimativo. Sirve como referencia rápida para tomar decisiones. Válido sólo para piezas en redes sociales. Para TV u otros medios, consultá por un presupuesto personalizado.
+                            <p className="italic mt-8 text-xs text-[#2a378d]/80">
+                                Recordá que éste es un presupuesto estimativo. Sirve como referencia rápida para tomar decisiones. Válido sólo para piezas en RRSS. Para TV u otros medios, consultá por un presupuesto personalizado.
                             </p>
                         </div>
                     )}
@@ -315,14 +318,14 @@ export default function App() {
                                 </div>
                                 <div className="flex-1 text-right">
                                     <button onClick={handleReset} className="text-[#2a378d] text-sm hover:bg-[#2a378d]/10 border border-[#2a378d] rounded-full px-4 py-1 transition-colors">
-                                        Volver a empezar
+                                        Reiniciar
                                     </button>
                                 </div>
                             </div>
                         </>
                     )}
                     <hr className="border-t border-[#2a378d]/50" />
-                    <p className="text-center text-xs mt-4 text-[#2a378d]/70">{formattedDate} ✦ Perro con Dos Colas</p>
+                    <p className="text-left text-xs mt-4 text-[#2a378d]/70">{formattedDate} ✦ Perro con Dos Colas</p>
                 </div>
             </div>
         </div>
@@ -379,7 +382,7 @@ function StepView({ step, stepId, onSelect, path, budgetFlow }) {
                     >
                         <input type="radio" name={stepId} value={key} className="sr-only" onChange={() => setSelection(key)} />
                         <div className="flex items-center gap-4">
-                            <span className="text-lg font-bold">{option.label}</span>
+                            <span className={` ${isStartStep ? 'text-2xl' : 'text-lg'}`}>{option.label}</span>
                             {option.isCustom && (
                                 <input 
                                     type="number" min="2" placeholder="ej: 7" value={customAmount}
