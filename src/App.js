@@ -28,8 +28,8 @@ export default function App() {
             type: 'radio',
             options: {
                 snack_cantidad_1: { label: "1 pieza", percentage: 0, next: "snack_duracion" },
-                snack_cantidad_2: { label: "2 piezas", percentage: 0.85, next: "snack_duracion" },
-                snack_cantidad_3: { label: "3 piezas", percentage: 0.75, next: "snack_duracion" },
+                snack_cantidad_2: { label: "2 piezas", percentage: 0.85, next: "snack_duracion" }, // Adds 85% for the 2nd piece
+                snack_cantidad_3: { label: "3 piezas", percentage: 1.60, next: "snack_duracion" }, // CORRECTED: Adds cost of 2nd (85%) and 3rd (75%) pieces. 0.85 + 0.75 = 1.60
                 snack_cantidad_custom: { label: "Otra cantidad:", isCustom: true, percentage_per_item: 0.7, next: "snack_duracion" }
             }
         },
