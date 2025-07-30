@@ -182,7 +182,25 @@ export default function App() {
             } else if (selectedOption.percentage) {
                 total += basePrice * selectedOption.percentage;
             } else if (selectedOption.fixedPrice) {
-                total += selectedOption.fixedPrice[firstChoiceKey] || 0;
+                if (p.stepId === 'guion_creativo' && firstChoiceKey === 'snack') {
+                    const cantidadStep = path.find(step => step.stepId === 'snack_cantidad');
+                    let quantity = 1;
+                    if (cantidadStep) {
+                        const cantidadOptionKey = cantidadStep.selection;
+                        const cantidadOption = budgetFlow.snack_cantidad.options[cantidadOptionKey];
+                        if (cantidadOption.isCustom) {
+                            quantity = cantidadStep.value || 1;
+                        } else {
+                            const labelMatch = cantidadOption.label.match(/\d+/);
+                            if (labelMatch) {
+                                quantity = parseInt(labelMatch[0], 10);
+                            }
+                        }
+                    }
+                    total += (selectedOption.fixedPrice.snack || 0) * quantity;
+                } else {
+                    total += selectedOption.fixedPrice[firstChoiceKey] || 0;
+                }
             }
         });
         return Math.floor(total);
@@ -213,7 +231,6 @@ export default function App() {
 
         setPath(finalPath);
 
-        // ** NEW LOGIC: Decide where to go next
         if (returnToEnd) {
             setCurrentStepId('end');
             setReturnToEnd(false); // Reset the flag
@@ -304,51 +321,80 @@ export default function App() {
                                          label = `${p.value} piezas`;
                                      }
                                      const isFirst = p.stepId === 'start';
+
+                                     if (isFirst) {
+                                        return (
+                                            <p key={index} className="w-full text-left p-2 font-bold">
+                                                {label}
+                                            </p>
+                                        );
+                                     }
+
                                      return (
                                         <button 
                                             key={index}
                                             onClick={() => handleJumpToStep(p.stepId, true)} // Came from summary
-                                            className={`w-full text-left p-2 rounded-md transition-colors hover:bg-[#2a378d]/10 ${isFirst ? 'font-bold' : ''}`}
+                                            className="w-full text-left p-2 rounded-md transition-colors hover:bg-[#2a378d]/10"
                                         >
                                             {label}
                                         </button>
                                      );
                                  })}
-                                
-                                 {(() => {
-                                     const excludedItems = path
-                                         .map(p => budgetFlow[p.stepId].options[p.selection])
-                                         .filter(opt => opt && opt.label.startsWith("Sin "))
-                                         .map(opt => opt.label.substring(4).toLowerCase());
-
-                                     if (excludedItems.length > 0) {
-                                         const capitalized = excludedItems[0].charAt(0).toUpperCase() + excludedItems[0].slice(1);
-                                         const rest = excludedItems.slice(1);
-                                         return (
-                                             <>
-                                                 <hr className="border-t border-[#2a378d]/50 my-6" />
-                                                 <div className="text-lg">
-                                                    <p className="font-bold">No incluye:</p>
-                                                    <p className="text-[#2a378d]">{[capitalized, ...rest].join(', ')}.</p>
-                                                 </div>
-                                             </>
-                                         );
-                                     }
-                                     return null;
-                                 })()}
                              </div>
-                             <p className="italic mt-8 text-xs text-[#2a378d]">
-                                 Recordá que éste es un presupuesto estimativo. Sirve como referencia rápida para tomar decisiones. Válido sólo para piezas en RRSS. Para TV u otros medios, consultá por un presupuesto personalizado.
-                             </p>
                          </div>
                     )}
                 </div>
             </main>
 
-            <div className="mt-auto pt-8" style={{ paddingBottom: '50px' }}>
-                 <div className="w-full max-w-4xl mx-auto">
+            <footer className="w-full max-w-4xl mx-auto mt-auto pt-8" style={{ paddingBottom: '50px' }}>
+                 <div className="w-full">
                      {path.length > 0 && (
                          <>
+                            {currentStep && currentStep.isFinal && (
+                                <div className="mb-8">
+                                    {(() => {
+                                        const excludedSteps = path
+                                            .filter(p => {
+                                                const option = budgetFlow[p.stepId]?.options[p.selection];
+                                                return option && option.label.startsWith("Sin ");
+                                            })
+                                            .map(p => {
+                                                const option = budgetFlow[p.stepId].options[p.selection];
+                                                const cleanLabel = option.label.substring(4);
+                                                return {
+                                                    stepId: p.stepId,
+                                                    label: cleanLabel.charAt(0).toUpperCase() + cleanLabel.slice(1)
+                                                };
+                                            });
+
+                                        if (excludedSteps.length > 0) {
+                                            return (
+                                                <>
+                                                    <hr className="border-t border-[#2a378d]/50 my-8" />
+                                                    <div className="text-lg">
+                                                        <p>No incluye:</p>
+                                                        <div className="space-y-1 mt-2">
+                                                            {excludedSteps.map(step => (
+                                                                <button
+                                                                    key={step.stepId}
+                                                                    onClick={() => handleJumpToStep(step.stepId, true)}
+                                                                    className="w-full text-left p-2 rounded-md transition-colors hover:bg-[#2a378d]/10 text-base"
+                                                                >
+                                                                    {step.label}
+                                                                </button>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                </>
+                                            );
+                                        }
+                                        return null;
+                                    })()}
+                                    <p className="italic mt-8 text-xs text-[#2a378d]">
+                                        Recordá que éste es un presupuesto estimativo. Sirve como referencia rápida para tomar decisiones. Válido sólo para piezas en RRSS. Para TV u otros medios, consultá por un presupuesto personalizado.
+                                    </p>
+                                </div>
+                            )}
                              <hr className="border-t border-[#2a378d]/50" />
                              <div className="flex justify-between items-center py-4">
                                  <div className="flex-1 text-left">
@@ -372,7 +418,7 @@ export default function App() {
                      <hr className="border-t border-[#2a378d]/50" />
                      <p className="text-left text-xs mt-4 text-[#2a378d]">{formattedDate} ✦ Perro con Dos Colas</p>
                  </div>
-            </div>
+            </footer>
         </div>
     );
 }
