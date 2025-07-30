@@ -8,7 +8,7 @@ export default function App() {
     // --- PRICING CONFIGURATION ---
     const BASE_PRICES = {
         snack: 285000,
-        storytelling: 910000,
+        storytelling: 1510000,
     };
 
     // --- FLOW CONFIGURATION ---
@@ -90,7 +90,7 @@ export default function App() {
             type: 'radio',
             options: {
                 story_duracion_15: { label: "15 segundos", percentage: 0, next: "story_adapt_duracion" },
-                story_duracion_30: { label: "30 segundos", percentage: 0.2, next: "story_adapt_duracion" }
+                story_duracion_30: { label: "30 segundos", percentage: 0.3, next: "story_adapt_duracion" }
             }
         },
         story_adapt_duracion: {
