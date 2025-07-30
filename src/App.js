@@ -5,12 +5,12 @@ export default function App() {
     // --- SET BROWSER TAB TITLE ---
     useEffect(() => {
         document.title = "Calculadora Perro";
-    }, []); // Empty dependency array ensures this runs only once when the component mounts.
+    }, []);
 
     // --- STATE MANAGEMENT ---
     const [path, setPath] = useState([]);
     const [currentStepId, setCurrentStepId] = useState('start');
-    const [returnToEnd, setReturnToEnd] = useState(false); // State to track if we should return to summary
+    const [returnToEnd, setReturnToEnd] = useState(false);
 
     // --- PRICING CONFIGURATION ---
     const BASE_PRICES = {
@@ -18,7 +18,7 @@ export default function App() {
         storytelling: 1510000,
     };
 
-    // --- FLOW CONFIGURATION (UNCHANGED) ---
+    // --- FLOW CONFIGURATION ---
     const budgetFlow = {
         start: {
             question: "¡Hola Euge!\nElegí un tipo de contenido audiovisual",
@@ -33,8 +33,8 @@ export default function App() {
             type: 'radio',
             options: {
                 snack_cantidad_1: { label: "1 pieza", percentage: 0, next: "snack_duracion" },
-                snack_cantidad_2: { label: "2 piezas", percentage: 0.85, next: "snack_duracion" }, // Adds 85% for the 2nd piece
-                snack_cantidad_3: { label: "3 piezas", percentage: 1.60, next: "snack_duracion" }, // CORRECTED: Adds cost of 2nd (85%) and 3rd (75%) pieces. 0.85 + 0.75 = 1.60
+                snack_cantidad_2: { label: "2 piezas", percentage: 0.85, next: "snack_duracion" },
+                snack_cantidad_3: { label: "3 piezas", percentage: 1.60, next: "snack_duracion" },
                 snack_cantidad_custom: { label: "Otra cantidad:", isCustom: true, percentage_per_item: 0.7, next: "snack_duracion" }
             }
         },
@@ -238,7 +238,7 @@ export default function App() {
 
         if (returnToEnd) {
             setCurrentStepId('end');
-            setReturnToEnd(false); // Reset the flag
+            setReturnToEnd(false);
         } else {
             const nextStepId = budgetFlow[stepId].options[selection].next;
             setCurrentStepId(nextStepId);
@@ -257,174 +257,183 @@ export default function App() {
     }
 
     const today = new Date();
-    const formattedDate = `${today.getDate().toString().padStart(2, '0')}/${(today.getMonth() + 1).toString().padStart(2, '0')}/${today.getFullYear()}`;
+    const weekdays = ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"];
+    const months = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
+    const formattedDate = `Hoy es ${weekdays[today.getDay()]} ${today.getDate()} de ${months[today.getMonth()]} de ${today.getFullYear()} ✦ Perro con Dos Colas`;
 
     const currentStep = budgetFlow[currentStepId];
     const isEditing = path.some(p => p.stepId === currentStepId);
     const initialSelection = path.find(p => p.stepId === currentStepId);
 
     return (
-        <div className="bg-[#ede8dc] text-[#2a378d] min-h-screen font-sans flex flex-col p-4 sm:p-6 lg:p-8">
-            <header className="w-full max-w-4xl mx-auto mb-4 flex justify-start items-center">
-                <img src="https://i.imgur.com/3V0wUeJ.png" alt="Logo de Perro Con Dos Colas" className="h-10 rounded" />
-            </header>
+        <>
+            <style>
+                {`
+                    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700&display=swap');
+                    .font-jakarta {
+                        font-family: 'Plus Jakarta Sans', sans-serif;
+                    }
+                `}
+            </style>
+            <div className="bg-[#ede8dc] text-[#2a378d] min-h-screen font-jakarta flex flex-col p-4 sm:p-6 lg:p-8">
+                <header className="w-full max-w-4xl mx-auto mb-4 flex justify-start items-center">
+                    <img src="https://i.imgur.com/3V0wUeJ.png" alt="Logo de Perro Con Dos Colas" className="h-10 rounded" />
+                </header>
 
-            <main className="w-full max-w-4xl mx-auto flex-grow">
-                {currentStep && !currentStep.isFinal && (
-                    <div className="mb-8 min-h-[40px] flex flex-wrap items-center gap-2">
-                        {path.map((p, index) => {
-                            const stepInfo = budgetFlow[p.stepId];
-                            if (!stepInfo || !stepInfo.options) return null;
-                            const optionInfo = stepInfo.options[p.selection];
-                            if (!optionInfo) return null;
-                            let label = optionInfo.label;
-                            if (optionInfo.isCustom && p.value) {
-                                label = `${p.value} piezas`;
-                            }
-                            const isActive = p.stepId === currentStepId;
-                            return (
-                                <button
-                                    key={`${p.stepId}-${index}`}
-                                    onClick={() => handleJumpToStep(p.stepId, false)} // Came from breadcrumbs
-                                    className={`rounded-full px-3 py-1 text-sm font-medium transition-all ${
-                                        isActive
-                                            ? 'bg-[#2a378d] text-white'
-                                            : 'bg-[#2a378d]/10 text-[#2a378d] hover:bg-[#2a378d]/20'
-                                    }`}
-                                >
-                                    {label}
-                                </button>
-                            );
-                        })}
-                    </div>
-                )}
-
-                <div>
+                <main className="w-full max-w-4xl mx-auto flex-grow">
                     {currentStep && !currentStep.isFinal && (
-                        <StepView
-                            key={currentStepId}
-                            step={currentStep}
-                            stepId={currentStepId}
-                            onSelect={handleConfirmSelection}
-                            path={path}
-                            budgetFlow={budgetFlow}
-                            isEditing={isEditing}
-                            initialSelection={initialSelection}
-                        />
+                        <div className="mb-8 min-h-[40px] flex flex-wrap items-center gap-2">
+                            {path.map((p, index) => {
+                                const stepInfo = budgetFlow[p.stepId];
+                                if (!stepInfo || !stepInfo.options) return null;
+                                const optionInfo = stepInfo.options[p.selection];
+                                if (!optionInfo) return null;
+                                let label = optionInfo.label;
+                                if (optionInfo.isCustom && p.value) {
+                                    label = `${p.value} piezas`;
+                                }
+                                const isActive = p.stepId === currentStepId;
+                                return (
+                                    <button
+                                        key={`${p.stepId}-${index}`}
+                                        onClick={() => handleJumpToStep(p.stepId, false)}
+                                        className={`rounded-full px-3 py-1 text-sm font-medium transition-all ${
+                                            isActive
+                                                ? 'bg-[#2a378d] text-white'
+                                                : 'bg-[#2a378d]/10 text-[#2a378d] hover:bg-[#2a378d]/20'
+                                        }`}
+                                    >
+                                        {label}
+                                    </button>
+                                );
+                            })}
+                        </div>
                     )}
 
-                    {currentStep && currentStep.isFinal && (
-                         <div className="text-left animate-fade-in">
-                             <h2 className="text-xl sm:text-2xl text-left">Resumen</h2>
-                             <hr className="border-t border-[#2a378d]/50 my-6" />
-                             <div className="space-y-1 text-lg">
-                                 {path.filter(p => !budgetFlow[p.stepId].options[p.selection].label.startsWith("Sin ")).map((p, index) => {
-                                     const optionInfo = budgetFlow[p.stepId].options[p.selection];
-                                     if (!optionInfo) return null;
-                                     let label = optionInfo.label;
-                                     if (optionInfo.isCustom && p.value) {
-                                         label = `${p.value} piezas`;
-                                     }
-                                     const isFirst = p.stepId === 'start';
+                    <div>
+                        {currentStep && !currentStep.isFinal && (
+                            <StepView
+                                key={currentStepId}
+                                step={currentStep}
+                                stepId={currentStepId}
+                                onSelect={handleConfirmSelection}
+                                path={path}
+                                budgetFlow={budgetFlow}
+                                isEditing={isEditing}
+                                initialSelection={initialSelection}
+                            />
+                        )}
 
-                                     if (isFirst) {
-                                        return (
-                                            <p key={index} className="w-full text-left p-2 font-bold">
-                                                {label}
-                                            </p>
-                                        );
-                                     }
+                        {currentStep && currentStep.isFinal && (
+                             <div className="text-left animate-fade-in">
+                                 <h2 className="text-xl sm:text-2xl text-left">Resumen</h2>
+                                 <hr className="border-t border-[#2a378d]/50 my-6" />
+                                 <div className="space-y-1 text-lg">
+                                     {path.filter(p => !budgetFlow[p.stepId].options[p.selection].label.startsWith("Sin ")).map((p, index) => {
+                                         const optionInfo = budgetFlow[p.stepId].options[p.selection];
+                                         if (!optionInfo) return null;
+                                         let label = optionInfo.label;
+                                         if (optionInfo.isCustom && p.value) {
+                                             label = `${p.value} piezas`;
+                                         }
+                                         const isFirst = p.stepId === 'start';
 
-                                     return (
-                                        <button 
-                                            key={index}
-                                            onClick={() => handleJumpToStep(p.stepId, true)} // Came from summary
-                                            className="w-full text-left p-2 rounded-md transition-colors hover:bg-[#2a378d]/10"
-                                        >
-                                            {label}
-                                        </button>
-                                     );
-                                 })}
-                             </div>
-                         </div>
-                    )}
-                </div>
-            </main>
-
-            <footer className="w-full max-w-4xl mx-auto mt-auto pt-8" style={{ paddingBottom: '50px' }}>
-                 <div className="w-full">
-                     {path.length > 0 && (
-                         <>
-                            {currentStep && currentStep.isFinal && (
-                                <div className="mb-8">
-                                    {(() => {
-                                        const excludedSteps = path
-                                            .filter(p => {
-                                                const option = budgetFlow[p.stepId]?.options[p.selection];
-                                                return option && option.label.startsWith("Sin ");
-                                            })
-                                            .map(p => {
-                                                const option = budgetFlow[p.stepId].options[p.selection];
-                                                const cleanLabel = option.label.substring(4);
-                                                return {
-                                                    stepId: p.stepId,
-                                                    label: cleanLabel.charAt(0).toUpperCase() + cleanLabel.slice(1)
-                                                };
-                                            });
-
-                                        if (excludedSteps.length > 0) {
+                                         if (isFirst) {
                                             return (
-                                                <>
-                                                    <hr className="border-t border-[#2a378d]/50 my-8" />
-                                                    <div className="text-lg">
-                                                        <p>No incluye:</p>
-                                                        <div className="space-y-1 mt-2">
+                                                <p key={index} className="w-full text-left p-2 font-bold">
+                                                    {label}
+                                                </p>
+                                            );
+                                         }
+
+                                         return (
+                                            <button 
+                                                key={index}
+                                                onClick={() => handleJumpToStep(p.stepId, true)}
+                                                className="w-full text-left p-2 rounded-md transition-colors hover:bg-[#2a378d]/10"
+                                            >
+                                                {label}
+                                            </button>
+                                         );
+                                     })}
+                                 </div>
+                             </div>
+                        )}
+                    </div>
+                </main>
+
+                <footer className="w-full max-w-4xl mx-auto mt-auto pt-8" style={{ paddingBottom: '50px' }}>
+                     <div className="w-full">
+                         {path.length > 0 && (
+                             <>
+                                {currentStep && currentStep.isFinal && (
+                                    <div className="mb-8">
+                                        {(() => {
+                                            const excludedSteps = path
+                                                .filter(p => {
+                                                    const option = budgetFlow[p.stepId]?.options[p.selection];
+                                                    return option && option.label.startsWith("Sin ");
+                                                })
+                                                .map(p => {
+                                                    const option = budgetFlow[p.stepId].options[p.selection];
+                                                    const cleanLabel = option.label.substring(4);
+                                                    return {
+                                                        stepId: p.stepId,
+                                                        label: cleanLabel.charAt(0).toUpperCase() + cleanLabel.slice(1)
+                                                    };
+                                                });
+
+                                            if (excludedSteps.length > 0) {
+                                                return (
+                                                    <div className="text-base mt-8">
+                                                        <p className="mb-2">No incluye:</p>
+                                                        <div className="space-y-1">
                                                             {excludedSteps.map(step => (
                                                                 <button
                                                                     key={step.stepId}
                                                                     onClick={() => handleJumpToStep(step.stepId, true)}
-                                                                    className="w-full text-left p-2 rounded-md transition-colors hover:bg-[#2a378d]/10 text-base"
+                                                                    className="w-full text-left p-2 rounded-md transition-colors hover:bg-[#2a378d]/10"
                                                                 >
                                                                     {step.label}
                                                                 </button>
                                                             ))}
                                                         </div>
                                                     </div>
-                                                </>
-                                            );
-                                        }
-                                        return null;
-                                    })()}
-                                    <p className="italic mt-8 text-xs text-[#2a378d]">
-                                        Recordá que éste es un presupuesto estimativo. Sirve como referencia rápida para tomar decisiones. Válido sólo para piezas en RRSS. Para TV u otros medios, consultá por un presupuesto personalizado.
-                                    </p>
-                                </div>
-                            )}
-                             <hr className="border-t border-[#2a378d]/50" />
-                             <div className="flex justify-between items-center py-4">
-                                 <div className="flex-1 text-left">
-                                     <span className="text-lg sm:text-xl">
-                                         {currentStep && currentStep.isFinal ? "Total Final" : "Total Parcial"}
-                                     </span>
+                                                );
+                                            }
+                                            return null;
+                                        })()}
+                                        <p className="italic mt-8 text-xs text-[#2a378d]">
+                                            Recordá que éste es un presupuesto estimativo. Sirve como referencia rápida para tomar decisiones. Válido sólo para piezas en RRSS. Para TV u otros medios, consultá por un presupuesto personalizado.
+                                        </p>
+                                    </div>
+                                )}
+                                 <hr className="border-t border-[#2a378d]/50" />
+                                 <div className="flex justify-between items-center py-4">
+                                     <div className="flex-1 text-left">
+                                         <span className="text-lg sm:text-xl">
+                                             {currentStep && currentStep.isFinal ? "Total Final" : "Total Parcial"}
+                                         </span>
+                                     </div>
+                                     <div className="flex-1 text-center">
+                                         <span className="text-xl sm:text-2xl text-[#2a378d] font-bold">
+                                             ${new Intl.NumberFormat('es-AR').format(totalPrice)}
+                                         </span>
+                                     </div>
+                                     <div className="flex-1 text-right">
+                                         <button onClick={handleReset} className="text-[#2a378d] text-sm hover:bg-[#2a378d]/10 border border-[#2a378d] rounded-full px-4 py-1 transition-colors">
+                                             Reiniciar
+                                         </button>
+                                     </div>
                                  </div>
-                                 <div className="flex-1 text-center">
-                                     <span className="text-xl sm:text-2xl text-[#2a378d] font-bold">
-                                         ${new Intl.NumberFormat('es-AR').format(totalPrice)}
-                                     </span>
-                                 </div>
-                                 <div className="flex-1 text-right">
-                                     <button onClick={handleReset} className="text-[#2a378d] text-sm hover:bg-[#2a378d]/10 border border-[#2a378d] rounded-full px-4 py-1 transition-colors">
-                                         Reiniciar
-                                     </button>
-                                 </div>
-                             </div>
-                         </>
-                     )}
-                     <hr className="border-t border-[#2a378d]/50" />
-                     <p className="text-left text-xs mt-4 text-[#2a378d]">{formattedDate} ✦ Perro con Dos Colas</p>
-                 </div>
-            </footer>
-        </div>
+                             </>
+                         )}
+                         <hr className="border-t border-[#2a378d]/50" />
+                         <p className="text-left text-xs mt-4 text-[#2a378d]">{formattedDate}</p>
+                     </div>
+                </footer>
+            </div>
+        </>
     );
 }
 
@@ -457,7 +466,7 @@ function StepView({ step, stepId, onSelect, path, budgetFlow, isEditing, initial
         const chosenFormatLabel = budgetFlow[formatStepId].options[formatChoice.selection].label;
         const remainingFormats = allFormats.filter(f => f !== chosenFormatLabel);
 
-        const newOptions = JSON.parse(JSON.stringify(step.options)); // Deep copy
+        const newOptions = JSON.parse(JSON.stringify(step.options));
         if (remainingFormats.length === 2) {
             newOptions[Object.keys(newOptions)[0]].label = `Una adaptación (${remainingFormats[0]} o ${remainingFormats[1]})`;
             newOptions[Object.keys(newOptions)[1]].label = `Dos adaptaciones (${remainingFormats[0]} y ${remainingFormats[1]})`;
