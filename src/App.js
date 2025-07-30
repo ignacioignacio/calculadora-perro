@@ -26,9 +26,9 @@ export default function App() {
             type: 'radio',
             options: {
                 snack_cantidad_1: { label: "1 pieza", percentage: 0, next: "snack_duracion" },
-                snack_cantidad_2: { label: "2 piezas", percentage: 0.8, next: "snack_duracion" },
-                snack_cantidad_3: { label: "3 piezas", percentage: 0.7, next: "snack_duracion" },
-                snack_cantidad_custom: { label: "Otra cantidad:", isCustom: true, percentage_per_item: 0.6, next: "snack_duracion" }
+                snack_cantidad_2: { label: "2 piezas", percentage: 0.85, next: "snack_duracion" },
+                snack_cantidad_3: { label: "3 piezas", percentage: 0.75, next: "snack_duracion" },
+                snack_cantidad_custom: { label: "Otra cantidad:", isCustom: true, percentage_per_item: 0.7, next: "snack_duracion" }
             }
         },
         snack_duracion: {
@@ -36,7 +36,7 @@ export default function App() {
             type: 'radio',
             options: {
                 snack_duracion_15: { label: "15 segundos", percentage: 0, next: "snack_adapt_duracion" },
-                snack_duracion_30: { label: "30 segundos", percentage: 0.25, next: "snack_adapt_duracion" }
+                snack_duracion_30: { label: "30 segundos", percentage: 0.2, next: "snack_adapt_duracion" }
             }
         },
         snack_adapt_duracion: {
@@ -44,8 +44,8 @@ export default function App() {
             clarification: "Menores a la duración elegida en el punto anterior.",
             type: 'radio',
             options: {
-                snack_adapt_duracion_1: { label: "1 reducción", percentage: 0.15, next: "snack_formatos" },
-                snack_adapt_duracion_2: { label: "2 reducciones", percentage: 0.1, next: "snack_formatos" },
+                snack_adapt_duracion_1: { label: "1 reducción", percentage: 0.1, next: "snack_formatos" },
+                snack_adapt_duracion_2: { label: "2 reducciones", percentage: 0.15, next: "snack_formatos" },
                 snack_adapt_duracion_no: { label: "Sin reducciones", percentage: 0, next: "snack_formatos" }
             }
         },
@@ -63,8 +63,8 @@ export default function App() {
             isDynamic: true,
             type: 'radio',
             options: {
-                snack_adapt_formato_1: { label: "Una adaptación", percentage: 0.15, next: "snack_voz_off" },
-                snack_adapt_formato_2: { label: "Dos adaptaciones", percentage: 0.15, next: "snack_voz_off" },
+                snack_adapt_formato_1: { label: "Una adaptación", percentage: 0.2, next: "snack_voz_off" },
+                snack_adapt_formato_2: { label: "Dos adaptaciones", percentage: 0.3, next: "snack_voz_off" },
                 snack_adapt_formato_no: { label: "Sin adaptaciones de formato", percentage: 0, next: "snack_voz_off" }
             }
         },
@@ -72,7 +72,7 @@ export default function App() {
             question: "Locución IA",
             type: 'radio',
             options: {
-                snack_voz_off_si: { label: "Con locución", percentage: 0.5, next: "snack_entrenamiento" },
+                snack_voz_off_si: { label: "Con locución", percentage: 0.15, next: "snack_entrenamiento" },
                 snack_voz_off_no: { label: "Sin locución", percentage: 0, next: "snack_entrenamiento" }
             }
         },
@@ -80,8 +80,8 @@ export default function App() {
             question: "Inclusión de producto",
             type: 'radio',
             options: {
-                snack_entrenamiento_1: { label: "Un producto", percentage: 0.5, next: "guion_creativo" },
-                snack_entrenamiento_2: { label: "Dos productos", percentage: 0.1, next: "guion_creativo" },
+                snack_entrenamiento_1: { label: "Un producto", percentage: 0.15, next: "guion_creativo" },
+                snack_entrenamiento_2: { label: "Dos productos", percentage: 0.25, next: "guion_creativo" },
                 snack_entrenamiento_no: { label: "Sin inclusión de producto", percentage: 0, next: "guion_creativo" }
             }
         },
@@ -98,8 +98,8 @@ export default function App() {
             clarification: "Menores a la duración elegida en el punto anterior.",
             type: 'radio',
             options: {
-                story_adapt_duracion_1: { label: "1 reducción", percentage: 0.15, next: "story_formatos" },
-                story_adapt_duracion_2: { label: "2 reducciones", percentage: 0.1, next: "story_formatos" },
+                story_adapt_duracion_1: { label: "1 reducción", percentage: 0.1, next: "story_formatos" },
+                story_adapt_duracion_2: { label: "2 reducciones", percentage: 0.15, next: "story_formatos" },
                 story_adapt_duracion_no: { label: "Sin reducciones", percentage: 0, next: "story_formatos" }
             }
         },
@@ -117,8 +117,8 @@ export default function App() {
             isDynamic: true,
             type: 'radio',
             options: {
-                story_adapt_formato_1: { label: "Una adaptación", percentage: 0.15, next: "story_lipsync" },
-                story_adapt_formato_2: { label: "Dos adaptaciones", percentage: 0.1, next: "story_lipsync" },
+                story_adapt_formato_1: { label: "Una adaptación", percentage: 0.2, next: "story_lipsync" },
+                story_adapt_formato_2: { label: "Dos adaptaciones", percentage: 0.3, next: "story_lipsync" },
                 story_adapt_formato_no: { label: "Sin adaptaciones de formato", percentage: 0, next: "story_lipsync" }
             }
         },
@@ -127,7 +127,7 @@ export default function App() {
             clarification: "Voz en off y banda musical incluida.",
             type: 'radio',
             options: {
-                story_lipsync_1: { label: "1 actor con lipsync", percentage: 0.5, next: "story_entrenamiento" },
+                story_lipsync_1: { label: "1 actor con lipsync", percentage: 0.4, next: "story_entrenamiento" },
                 story_lipsync_2: { label: "2 actores con lipsync", percentage: 0.5, next: "story_entrenamiento" },
                 story_lipsync_no: { label: "Sin lipsync", percentage: 0, next: "story_entrenamiento" }
             }
@@ -136,8 +136,8 @@ export default function App() {
             question: "Inclusión de producto",
             type: 'radio',
             options: {
-                story_entrenamiento_1: { label: "Un producto", percentage: 0.1, next: "story_actor_referencia" },
-                story_entrenamiento_2: { label: "Dos productos", percentage: 0.2, next: "story_actor_referencia" },
+                story_entrenamiento_1: { label: "Un producto", percentage: 0.2, next: "story_actor_referencia" },
+                story_entrenamiento_2: { label: "Dos productos", percentage: 0.3, next: "story_actor_referencia" },
                 story_entrenamiento_no: { label: "Sin inclusión de producto", percentage: 0, next: "story_actor_referencia" }
             }
         },
@@ -153,7 +153,7 @@ export default function App() {
             question: "Guión creativo",
             type: 'radio',
             options: {
-                guion_creativo_si: { label: "Con guión creativo", fixedPrice: { snack: 60000, storytelling: 150000 }, next: "end" },
+                guion_creativo_si: { label: "Con guión creativo", fixedPrice: { snack: 40000, storytelling: 150000 }, next: "end" },
                 guion_creativo_no: { label: "Sin guión creativo", percentage: 0, next: "end" }
             }
         },
