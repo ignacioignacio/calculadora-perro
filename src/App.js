@@ -1,24 +1,26 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 
 // Main App Component
 export default function App() {
     // --- STATE MANAGEMENT ---
-    const [path, setPath] = useState([]); 
-    
+    const [path, setPath] = useState([]);
+    const [currentStepId, setCurrentStepId] = useState('start');
+    const [returnToEnd, setReturnToEnd] = useState(false); // State to track if we should return to summary
+
     // --- PRICING CONFIGURATION ---
     const BASE_PRICES = {
         snack: 285000,
         storytelling: 1510000,
     };
 
-    // --- FLOW CONFIGURATION ---
+    // --- FLOW CONFIGURATION (UNCHANGED) ---
     const budgetFlow = {
         start: {
-            question: "Euge, elegí un tipo de contenido audiovisual a presupuestar",
+            question: "¡Hola Euge!\nElegí un tipo de contenido audiovisual",
             type: 'radio',
             options: {
                 snack: { label: "Snack Content", description: "Ideas para mostrar producto/servicios, situaciones de consumo/uso y contar novedades. De producción rápida, edición simple y vida corta.", next: "snack_cantidad" },
-                storytelling: { label: "Storytelling", description: "Ideal para contar historias y construir marca. Mayor vida útil. Puede incluir lipsync, escenarios reales, y gestos generado a partir de actuaciones reales.", next: "story_duracion" }
+                storytelling: { label: "Storytelling", description: "Ideal para contar historias y construir marca. Mayor vida útil. Puede incluir lipsync, escenarios reales, y gestos generado a partir de actuaciones reales. Solo RRSS.", next: "story_duracion" }
             }
         },
         snack_cantidad: {
@@ -161,17 +163,7 @@ export default function App() {
             isFinal: true
         }
     };
-    
-    const currentStepId = useMemo(() => {
-        if (path.length === 0) return 'start';
-        const lastSelection = path[path.length - 1];
-        const lastStep = budgetFlow[lastSelection.stepId];
-        if (!lastStep || !lastStep.options || !lastStep.options[lastSelection.selection]) return 'end';
-        return lastStep.options[lastSelection.selection].next;
-    }, [path]);
 
-    const currentStep = budgetFlow[currentStepId];
-    
     const totalPrice = useMemo(() => {
         if (path.length === 0) return 0;
         const firstChoiceKey = path[0].selection;
@@ -179,7 +171,7 @@ export default function App() {
         if (basePrice === 0) return 0;
         let total = basePrice;
         path.forEach(p => {
-            if (p.stepId === 'start') return; 
+            if (p.stepId === 'start') return;
             const stepOptions = budgetFlow[p.stepId].options;
             const selectedOption = stepOptions[p.selection];
             if (selectedOption.isCustom) {
@@ -196,28 +188,65 @@ export default function App() {
         return Math.floor(total);
     }, [path, BASE_PRICES, budgetFlow]);
 
-    const handleSelection = (stepId, selection, value = null) => {
-        const newPath = [...path, { stepId, selection, value }];
-        setPath(newPath);
+    const handleConfirmSelection = (stepId, selection, value = null) => {
+        const stepIndex = path.findIndex(p => p.stepId === stepId);
+        const newSelectionData = { stepId, selection, value };
+
+        let finalPath;
+
+        if (stepIndex !== -1) { // This is an UPDATE
+            let tempPath = path.slice(0, stepIndex);
+            tempPath.push(newSelectionData);
+
+            const newOption = budgetFlow[stepId].options[selection];
+            const expectedNextStepId = newOption.next;
+            const originalNextStep = path[stepIndex + 1];
+
+            if (originalNextStep && originalNextStep.stepId === expectedNextStepId) {
+                finalPath = [...tempPath, ...path.slice(stepIndex + 1)];
+            } else {
+                finalPath = tempPath;
+            }
+        } else { // This is a new APPEND
+            finalPath = [...path, newSelectionData];
+        }
+
+        setPath(finalPath);
+
+        // ** NEW LOGIC: Decide where to go next
+        if (returnToEnd) {
+            setCurrentStepId('end');
+            setReturnToEnd(false); // Reset the flag
+        } else {
+            const nextStepId = budgetFlow[stepId].options[selection].next;
+            setCurrentStepId(nextStepId);
+        }
     };
 
-    const handleJumpToStep = (stepIndex) => {
-        setPath(path.slice(0, stepIndex));
+    const handleJumpToStep = (stepId, fromSummary = false) => {
+        setCurrentStepId(stepId);
+        setReturnToEnd(fromSummary);
     };
-    
+
     const handleReset = () => {
         setPath([]);
+        setCurrentStepId('start');
+        setReturnToEnd(false);
     }
-    
+
     const today = new Date();
     const formattedDate = `${today.getDate().toString().padStart(2, '0')}/${(today.getMonth() + 1).toString().padStart(2, '0')}/${today.getFullYear()}`;
+
+    const currentStep = budgetFlow[currentStepId];
+    const isEditing = path.some(p => p.stepId === currentStepId);
+    const initialSelection = path.find(p => p.stepId === currentStepId);
 
     return (
         <div className="bg-[#ede8dc] text-[#2a378d] min-h-screen font-sans flex flex-col p-4 sm:p-6 lg:p-8">
             <header className="w-full max-w-4xl mx-auto mb-4 flex justify-start items-center">
-                <img src="https://i.imgur.com/3V0wUeJ.png" alt="Perro Con Dos Colas" className="h-10 rounded" />
+                <img src="https://i.imgur.com/3V0wUeJ.png" alt="Logo de Perro Con Dos Colas" className="h-10 rounded" />
             </header>
-            
+
             <main className="w-full max-w-4xl mx-auto flex-grow">
                 {currentStep && !currentStep.isFinal && (
                     <div className="mb-8 min-h-[40px] flex flex-wrap items-center gap-2">
@@ -230,11 +259,16 @@ export default function App() {
                             if (optionInfo.isCustom && p.value) {
                                 label = `${p.value} piezas`;
                             }
+                            const isActive = p.stepId === currentStepId;
                             return (
-                                <button 
+                                <button
                                     key={`${p.stepId}-${index}`}
-                                    onClick={() => handleJumpToStep(index)}
-                                    className="bg-[#2a378d]/10 text-[#2a378d] rounded-full px-3 py-1 text-sm hover:bg-[#2a378d]/20 transition-all"
+                                    onClick={() => handleJumpToStep(p.stepId, false)} // Came from breadcrumbs
+                                    className={`rounded-full px-3 py-1 text-sm font-medium transition-all ${
+                                        isActive
+                                            ? 'bg-[#2a378d] text-white'
+                                            : 'bg-[#2a378d]/10 text-[#2a378d] hover:bg-[#2a378d]/20'
+                                    }`}
                                 >
                                     {label}
                                 </button>
@@ -245,96 +279,121 @@ export default function App() {
 
                 <div>
                     {currentStep && !currentStep.isFinal && (
-                        <StepView 
+                        <StepView
                             key={currentStepId}
-                            step={currentStep} 
-                            stepId={currentStepId} 
-                            onSelect={handleSelection} 
+                            step={currentStep}
+                            stepId={currentStepId}
+                            onSelect={handleConfirmSelection}
                             path={path}
                             budgetFlow={budgetFlow}
+                            isEditing={isEditing}
+                            initialSelection={initialSelection}
                         />
                     )}
 
                     {currentStep && currentStep.isFinal && (
-                         <div className="text-left">
-                            <h2 className="text-xl sm:text-2xl text-left">Resumen</h2>
-                            <hr className="border-t border-[#2a378d]/50 my-6" />
-                            <div className="space-y-2 text-lg">
-                                {path.filter(p => !budgetFlow[p.stepId].options[p.selection].label.startsWith("Sin ")).map((p, index) => {
-                                    const optionInfo = budgetFlow[p.stepId].options[p.selection];
-                                    if (!optionInfo) return null;
-                                    let label = optionInfo.label;
-                                    if (optionInfo.isCustom && p.value) {
-                                        label = `${p.value} piezas`;
-                                    }
-                                    const isFirst = p.stepId === 'start';
-                                    return <p key={index} className={`${isFirst ? 'font-bold' : ''}`}>{label}</p>;
-                                })}
+                         <div className="text-left animate-fade-in">
+                             <h2 className="text-xl sm:text-2xl text-left">Resumen</h2>
+                             <hr className="border-t border-[#2a378d]/50 my-6" />
+                             <div className="space-y-1 text-lg">
+                                 {path.filter(p => !budgetFlow[p.stepId].options[p.selection].label.startsWith("Sin ")).map((p, index) => {
+                                     const optionInfo = budgetFlow[p.stepId].options[p.selection];
+                                     if (!optionInfo) return null;
+                                     let label = optionInfo.label;
+                                     if (optionInfo.isCustom && p.value) {
+                                         label = `${p.value} piezas`;
+                                     }
+                                     const isFirst = p.stepId === 'start';
+                                     return (
+                                        <button 
+                                            key={index}
+                                            onClick={() => handleJumpToStep(p.stepId, true)} // Came from summary
+                                            className={`w-full text-left p-2 rounded-md transition-colors hover:bg-[#2a378d]/10 ${isFirst ? 'font-bold' : ''}`}
+                                        >
+                                            {label}
+                                        </button>
+                                     );
+                                 })}
                                 
-                                {(() => {
-                                    const excludedItems = path
-                                        .map(p => budgetFlow[p.stepId].options[p.selection])
-                                        .filter(opt => opt && opt.label.startsWith("Sin "))
-                                        .map(opt => opt.label.substring(4).toLowerCase());
+                                 {(() => {
+                                     const excludedItems = path
+                                         .map(p => budgetFlow[p.stepId].options[p.selection])
+                                         .filter(opt => opt && opt.label.startsWith("Sin "))
+                                         .map(opt => opt.label.substring(4).toLowerCase());
 
-                                    if (excludedItems.length > 0) {
-                                        const capitalized = excludedItems[0].charAt(0).toUpperCase() + excludedItems[0].slice(1);
-                                        const rest = excludedItems.slice(1);
-                                        return (
-                                            <>
-                                                <hr className="border-t border-[#2a378d]/50 my-4" />
-                                                <p className="text-lg mt-6">
-                                                    <span>No incluye:</span> {[capitalized, ...rest].join(', ')}.
-                                                </p>
-                                            </>
-                                        );
-                                    }
-                                    return null;
-                                })()}
-                            </div>
-                            <p className="italic mt-8 text-xs text-[#2a378d]/80">
-                                Recordá que éste es un presupuesto estimativo. Sirve como referencia rápida para tomar decisiones. Válido sólo para piezas en RRSS. Para TV u otros medios, consultá por un presupuesto personalizado.
-                            </p>
-                        </div>
+                                     if (excludedItems.length > 0) {
+                                         const capitalized = excludedItems[0].charAt(0).toUpperCase() + excludedItems[0].slice(1);
+                                         const rest = excludedItems.slice(1);
+                                         return (
+                                             <>
+                                                 <hr className="border-t border-[#2a378d]/50 my-6" />
+                                                 <div className="text-lg">
+                                                    <p className="font-bold">No incluye:</p>
+                                                    <p className="text-[#2a378d]">{[capitalized, ...rest].join(', ')}.</p>
+                                                 </div>
+                                             </>
+                                         );
+                                     }
+                                     return null;
+                                 })()}
+                             </div>
+                             <p className="italic mt-8 text-xs text-[#2a378d]">
+                                 Recordá que éste es un presupuesto estimativo. Sirve como referencia rápida para tomar decisiones. Válido sólo para piezas en RRSS. Para TV u otros medios, consultá por un presupuesto personalizado.
+                             </p>
+                         </div>
                     )}
                 </div>
             </main>
 
             <div className="mt-auto pt-8" style={{ paddingBottom: '50px' }}>
                  <div className="w-full max-w-4xl mx-auto">
-                    {path.length > 0 && (
-                        <>
-                            <hr className="border-t border-[#2a378d]/50" />
-                            <div className="flex justify-between items-center py-4">
-                                <div className="flex-1 text-left">
-                                    <span className="text-lg sm:text-xl">
-                                        {currentStep && currentStep.isFinal ? "Total Final" : "Total Parcial"}
-                                    </span>
-                                </div>
-                                <div className="flex-1 text-center">
-                                    <span className="text-xl sm:text-2xl text-[#2a378d] font-bold">
-                                        ${new Intl.NumberFormat('es-AR').format(totalPrice)}
-                                    </span>
-                                </div>
-                                <div className="flex-1 text-right">
-                                    <button onClick={handleReset} className="text-[#2a378d] text-sm hover:bg-[#2a378d]/10 border border-[#2a378d] rounded-full px-4 py-1 transition-colors">
-                                        Reiniciar
-                                    </button>
-                                </div>
-                            </div>
-                        </>
-                    )}
-                    <hr className="border-t border-[#2a378d]/50" />
-                    <p className="text-left text-xs mt-4 text-[#2a378d]/70">{formattedDate} ✦ Perro con Dos Colas</p>
-                </div>
+                     {path.length > 0 && (
+                         <>
+                             <hr className="border-t border-[#2a378d]/50" />
+                             <div className="flex justify-between items-center py-4">
+                                 <div className="flex-1 text-left">
+                                     <span className="text-lg sm:text-xl">
+                                         {currentStep && currentStep.isFinal ? "Total Final" : "Total Parcial"}
+                                     </span>
+                                 </div>
+                                 <div className="flex-1 text-center">
+                                     <span className="text-xl sm:text-2xl text-[#2a378d] font-bold">
+                                         ${new Intl.NumberFormat('es-AR').format(totalPrice)}
+                                     </span>
+                                 </div>
+                                 <div className="flex-1 text-right">
+                                     <button onClick={handleReset} className="text-[#2a378d] text-sm hover:bg-[#2a378d]/10 border border-[#2a378d] rounded-full px-4 py-1 transition-colors">
+                                         Reiniciar
+                                     </button>
+                                 </div>
+                             </div>
+                         </>
+                     )}
+                     <hr className="border-t border-[#2a378d]/50" />
+                     <p className="text-left text-xs mt-4 text-[#2a378d]">{formattedDate} ✦ Perro con Dos Colas</p>
+                 </div>
             </div>
         </div>
     );
 }
 
-function StepView({ step, stepId, onSelect, path, budgetFlow }) {
+function StepView({ step, stepId, onSelect, path, budgetFlow, isEditing, initialSelection }) {
     const [selection, setSelection] = useState(null);
     const [customAmount, setCustomAmount] = useState("");
+
+    useEffect(() => {
+        if (initialSelection) {
+            setSelection(initialSelection.selection);
+            if (initialSelection.value) {
+                setCustomAmount(initialSelection.value.toString());
+            } else {
+                setCustomAmount("");
+            }
+        } else {
+            setSelection(null);
+            setCustomAmount("");
+        }
+    }, [initialSelection]);
 
     const dynamicOptions = useMemo(() => {
         if (!step.isDynamic) return step.options;
@@ -346,7 +405,7 @@ function StepView({ step, stepId, onSelect, path, budgetFlow }) {
         const allFormats = Object.values(budgetFlow[formatStepId].options).map(opt => opt.label);
         const chosenFormatLabel = budgetFlow[formatStepId].options[formatChoice.selection].label;
         const remainingFormats = allFormats.filter(f => f !== chosenFormatLabel);
-        
+
         const newOptions = JSON.parse(JSON.stringify(step.options)); // Deep copy
         if (remainingFormats.length === 2) {
             newOptions[Object.keys(newOptions)[0]].label = `Una adaptación (${remainingFormats[0]} o ${remainingFormats[1]})`;
@@ -357,7 +416,7 @@ function StepView({ step, stepId, onSelect, path, budgetFlow }) {
 
     const isNextDisabled = !selection || (selection === 'snack_cantidad_custom' && (parseInt(customAmount) <= 1 || isNaN(parseInt(customAmount))));
 
-    const handleConfirmSelection = () => {
+    const handleConfirm = () => {
         if (isNextDisabled) return;
         if (selection === 'snack_cantidad_custom') {
             onSelect(stepId, selection, parseInt(customAmount));
@@ -370,21 +429,27 @@ function StepView({ step, stepId, onSelect, path, budgetFlow }) {
 
     return (
         <div className="animate-fade-in">
-            <h2 className={`text-left ${isStartStep ? 'text-2xl sm:text-3xl' : 'text-xl sm:text-2xl'}`}>{step.question}</h2>
+            <h2 className={`text-left ${isStartStep ? 'text-2xl sm:text-3xl' : 'text-xl sm:text-2xl'}`}>
+                {step.question.split('\n').map((line, index) => (
+                    <span key={index} className="block">
+                        {line}
+                    </span>
+                ))}
+            </h2>
             {step.clarification && <p className="text-sm text-left mt-1 text-[#2a378d]/80">{step.clarification}</p>}
             <hr className="border-t border-[#2a378d]/50 my-6" />
-            
+
             <div className={`flex flex-col gap-4 ${isStartStep ? 'md:grid md:grid-cols-2' : ''}`}>
                 {Object.entries(dynamicOptions).map(([key, option]) => (
-                    <label 
-                        key={key} 
+                    <label
+                        key={key}
                         className={`block w-full text-left p-4 rounded-lg cursor-pointer transition-all duration-200 ${selection === key ? 'bg-[#2a378d]/10' : 'hover:bg-[#2a378d]/5'}`}
                     >
-                        <input type="radio" name={stepId} value={key} className="sr-only" onChange={() => setSelection(key)} />
+                        <input type="radio" name={stepId} value={key} checked={selection === key} className="sr-only" onChange={() => setSelection(key)} />
                         <div className="flex items-center gap-4">
                             <span className={` ${isStartStep ? 'text-2xl' : 'text-lg'}`}>{option.label}</span>
                             {option.isCustom && (
-                                <input 
+                                <input
                                     type="number" min="2" placeholder="ej: 7" value={customAmount}
                                     onChange={(e) => setCustomAmount(e.target.value)}
                                     onClick={() => setSelection(key)}
@@ -399,17 +464,21 @@ function StepView({ step, stepId, onSelect, path, budgetFlow }) {
 
             <div className="mt-8 text-left">
                 <button
-                    onClick={handleConfirmSelection}
+                    onClick={handleConfirm}
                     disabled={isNextDisabled}
-                    className="bg-[#2a378d] text-white rounded-full p-3 disabled:bg-gray-400 disabled:cursor-not-allowed transition-all transform hover:scale-110 disabled:hover:scale-100"
-                    aria-label="Siguiente paso"
+                    className="bg-[#2a378d] text-white rounded-full p-3 h-12 w-auto flex items-center justify-center disabled:bg-gray-400 disabled:cursor-not-allowed transition-all transform hover:scale-110 disabled:hover:scale-100"
+                    aria-label={isEditing ? "Actualizar selección" : "Siguiente paso"}
                 >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="#ede8dc">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                    </svg>
+                    {isEditing ? (
+                        <span className="px-4 font-bold">Actualizar</span>
+                    ) : (
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="#ede8dc">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                        </svg>
+                    )}
                 </button>
             </div>
-            
+
             <style>{`.animate-fade-in { animation: fadeIn 0.5s ease-in-out; } @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }`}</style>
         </div>
     );
