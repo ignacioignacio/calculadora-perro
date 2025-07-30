@@ -212,8 +212,6 @@ export default function App() {
     };
 
     const handleJumpToStep = (stepIndex) => {
-        // This is the corrected logic. It slices the path up to the clicked index,
-        // so the app returns to that specific step for re-selection.
         setPath(path.slice(0, stepIndex));
     };
     
@@ -242,11 +240,11 @@ export default function App() {
 
                             let label = optionInfo.label;
                             if (optionInfo.isCustom && p.value) {
-                                label = ${p.value} piezas;
+                                label = `${p.value} piezas`;
                             }
 
                             return (
-                                <React.Fragment key={${p.stepId}-${index}}>
+                                <React.Fragment key={`${p.stepId}-${index}`}>
                                     <button 
                                         onClick={() => handleJumpToStep(index)}
                                         className="bg-[#2a378d]/10 text-[#2a378d] rounded-full px-3 py-1 text-sm hover:bg-[#2a378d]/20 transition-all"
@@ -283,11 +281,11 @@ export default function App() {
                                     
                                     let label = optionInfo.label;
                                     if (optionInfo.isCustom && p.value) {
-                                        label = ${p.value} piezas;
+                                        label = `${p.value} piezas`;
                                     }
                                     
                                     const isFirst = p.stepId === 'start';
-                                    return <p key={index} className={${isFirst ? 'font-bold' : ''}}>{label}</p>;
+                                    return <p key={index} className={`${isFirst ? 'font-bold' : ''}`}>{label}</p>;
                                 })}
                                 
                                 {(() => {
@@ -366,7 +364,7 @@ function StepView({ step, stepId, onSelect }) {
                 {Object.entries(step.options).map(([key, option]) => (
                     <label 
                         key={key} 
-                        className={block w-full text-left p-4 rounded-lg cursor-pointer transition-all duration-200 ${selection === key ? 'bg-[#2a378d]/10' : 'hover:bg-[#2a378d]/5'}}
+                        className={`block w-full text-left p-4 rounded-lg cursor-pointer transition-all duration-200 ${selection === key ? 'bg-[#2a378d]/10' : 'hover:bg-[#2a378d]/5'}`}
                     >
                         <input
                             type="radio"
@@ -411,7 +409,7 @@ function StepView({ step, stepId, onSelect }) {
                 </button>
             </div>
             
-            <style>{
+            <style>{`
                 .animate-fade-in {
                     animation: fadeIn 0.5s ease-in-out;
                 }
@@ -419,7 +417,7 @@ function StepView({ step, stepId, onSelect }) {
                     from { opacity: 0; transform: translateY(10px); }
                     to { opacity: 1; transform: translateY(0); }
                 }
-            }</style>
+            `}</style>
         </div>
     );
 }
