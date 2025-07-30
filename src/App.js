@@ -14,7 +14,7 @@ export default function App() {
     // --- FLOW CONFIGURATION ---
     const budgetFlow = {
         start: {
-            question: "¡Hola! Elegí un tipo de contenido audiovisual a presupuestar",
+            question: "Euge, elegí un tipo de contenido audiovisual a presupuestar",
             type: 'radio',
             options: {
                 snack: { label: "Snack Content", description: "Ideas para mostrar producto/servicios, situaciones de consumo/uso y contar novedades. De producción rápida, edición simple y vida corta.", next: "snack_cantidad" },
@@ -36,12 +36,12 @@ export default function App() {
             type: 'radio',
             options: {
                 snack_duracion_15: { label: "15 segundos", percentage: 0, next: "snack_adapt_duracion" },
-                snack_duracion_30: { label: "30 segundos", percentage: 0.2, next: "snack_adapt_duracion" }
+                snack_duracion_30: { label: "30 segundos", percentage: 0.25, next: "snack_adapt_duracion" }
             }
         },
         snack_adapt_duracion: {
             question: "Reducciones",
-            clarification: "Menores a la duración elegida en el punto anterior.",
+            clarification: "Menores a la duración base elegida en el punto anterior.",
             type: 'radio',
             options: {
                 snack_adapt_duracion_1: { label: "1 reducción", percentage: 0.1, next: "snack_formatos" },
@@ -63,8 +63,8 @@ export default function App() {
             isDynamic: true,
             type: 'radio',
             options: {
-                snack_adapt_formato_1: { label: "Una adaptación", percentage: 0.2, next: "snack_voz_off" },
-                snack_adapt_formato_2: { label: "Dos adaptaciones", percentage: 0.3, next: "snack_voz_off" },
+                snack_adapt_formato_1: { label: "Una adaptación", percentage: 0.25, next: "snack_voz_off" },
+                snack_adapt_formato_2: { label: "Dos adaptaciones", percentage: 0.35, next: "snack_voz_off" },
                 snack_adapt_formato_no: { label: "Sin adaptaciones de formato", percentage: 0, next: "snack_voz_off" }
             }
         },
