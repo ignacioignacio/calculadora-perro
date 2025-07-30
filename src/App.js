@@ -7,7 +7,7 @@ export default function App() {
     
     // --- PRICING CONFIGURATION ---
     const BASE_PRICES = {
-        snack: 370000,
+        snack: 285000,
         storytelling: 910000,
     };
 
@@ -18,7 +18,7 @@ export default function App() {
             type: 'radio',
             options: {
                 snack: { label: "Snack Content", description: "Ideas para mostrar producto/servicios, situaciones de consumo/uso y contar novedades. De producción rápida, edición simple y vida corta.", next: "snack_cantidad" },
-                storytelling: { label: "Storytelling", description: "Ideal para contar historias y construir marca. 30” máximo. Puede incluir lipsync, escenarios reales, voz en off y movimientos protagonizados por actores reales para mayor realismo. Mayor vida útil.", next: "story_duracion" }
+                storytelling: { label: "Storytelling", description: "Ideal para contar historias y construir marca. Mayor vida útil. Puede incluir lipsync, escenarios reales, y gestos generado a partir de actuaciones reales.", next: "story_duracion" }
             }
         },
         snack_cantidad: {
@@ -214,8 +214,7 @@ export default function App() {
 
     return (
         <div className="bg-[#ede8dc] text-[#2a378d] min-h-screen font-sans flex flex-col p-4 sm:p-6 lg:p-8">
-            <header className="w-full max-w-4xl mx-auto mb-8 flex justify-between items-center">
-                <div></div>
+            <header className="w-full max-w-4xl mx-auto mb-4 flex justify-end items-center">
                 <img src="https://i.imgur.com/3V0wUeJ.png" alt="Perro Con Dos Colas" className="h-10 rounded" />
             </header>
             
@@ -298,32 +297,34 @@ export default function App() {
                 </div>
             </main>
 
-            {path.length > 0 && (
-                <div className="mt-auto pt-8" style={{ paddingBottom: '50px' }}>
-                     <div className="w-full max-w-4xl mx-auto">
-                        <hr className="border-t border-[#2a378d]/50" />
-                        <div className="flex justify-between items-center py-4">
-                            <div className="flex-1 text-left">
-                                <span className="text-lg sm:text-xl">
-                                    {currentStep && currentStep.isFinal ? "Total Final" : "Total Parcial"}
-                                </span>
+            <div className="mt-auto pt-8" style={{ paddingBottom: '50px' }}>
+                 <div className="w-full max-w-4xl mx-auto">
+                    {path.length > 0 && (
+                        <>
+                            <hr className="border-t border-[#2a378d]/50" />
+                            <div className="flex justify-between items-center py-4">
+                                <div className="flex-1 text-left">
+                                    <span className="text-lg sm:text-xl">
+                                        {currentStep && currentStep.isFinal ? "Total Final" : "Total Parcial"}
+                                    </span>
+                                </div>
+                                <div className="flex-1 text-center">
+                                    <span className="text-xl sm:text-2xl text-[#2a378d] font-bold">
+                                        ${new Intl.NumberFormat('es-AR').format(totalPrice)}
+                                    </span>
+                                </div>
+                                <div className="flex-1 text-right">
+                                    <button onClick={handleReset} className="text-[#2a378d] text-sm hover:bg-[#2a378d]/10 border border-[#2a378d] rounded-full px-4 py-1 transition-colors">
+                                        Volver a empezar
+                                    </button>
+                                </div>
                             </div>
-                            <div className="flex-1 text-center">
-                                <span className="text-xl sm:text-2xl text-[#2a378d] font-bold">
-                                    ${new Intl.NumberFormat('es-AR').format(totalPrice)}
-                                </span>
-                            </div>
-                            <div className="flex-1 text-right">
-                                <button onClick={handleReset} className="text-[#2a378d] text-sm hover:bg-[#2a378d]/10 border border-[#2a378d] rounded-full px-4 py-1 transition-colors">
-                                    Volver a empezar
-                                </button>
-                            </div>
-                        </div>
-                        <hr className="border-t border-[#2a378d]/50" />
-                        <p className="text-center text-xs mt-2 text-[#2a378d]/70">{formattedDate} ✦ Perro con Dos Colas</p>
-                    </div>
+                        </>
+                    )}
+                    <hr className="border-t border-[#2a378d]/50" />
+                    <p className="text-center text-xs mt-4 text-[#2a378d]/70">{formattedDate} ✦ Perro con Dos Colas</p>
                 </div>
-            )}
+            </div>
         </div>
     );
 }
@@ -362,13 +363,15 @@ function StepView({ step, stepId, onSelect, path, budgetFlow }) {
         }
     };
 
+    const isStartStep = stepId === 'start';
+
     return (
         <div className="animate-fade-in">
-            <h2 className="text-xl sm:text-2xl text-left">{step.question}</h2>
+            <h2 className={`text-left ${isStartStep ? 'text-2xl sm:text-3xl' : 'text-xl sm:text-2xl'}`}>{step.question}</h2>
             {step.clarification && <p className="text-sm text-left mt-1 text-[#2a378d]/80">{step.clarification}</p>}
             <hr className="border-t border-[#2a378d]/50 my-6" />
             
-            <div className="flex flex-col gap-4">
+            <div className={`flex flex-col gap-4 ${isStartStep ? 'md:grid md:grid-cols-2' : ''}`}>
                 {Object.entries(dynamicOptions).map(([key, option]) => (
                     <label 
                         key={key} 
@@ -376,7 +379,7 @@ function StepView({ step, stepId, onSelect, path, budgetFlow }) {
                     >
                         <input type="radio" name={stepId} value={key} className="sr-only" onChange={() => setSelection(key)} />
                         <div className="flex items-center gap-4">
-                            <span className="text-lg">{option.label}</span>
+                            <span className="text-lg font-bold">{option.label}</span>
                             {option.isCustom && (
                                 <input 
                                     type="number" min="2" placeholder="ej: 7" value={customAmount}
