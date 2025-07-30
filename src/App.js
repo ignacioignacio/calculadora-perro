@@ -287,7 +287,7 @@ export default function App() {
             </style>
             <div className="bg-[#ede8dc] text-[#2a378d] min-h-screen font-dm-sans flex flex-col p-4 sm:p-6 lg:p-8">
                 <header className="w-full max-w-4xl mx-auto mb-4 flex justify-start items-center">
-                    <img src="https://i.imgur.com/cRio5RG.png" alt="Logo de Perro Con Dos Colas" className="h-10 rounded" />
+                    <img src="https://i.imgur.com/FmmOMcw.png" alt="Logo de Perro Con Dos Colas" className="h-10 rounded" />
                 </header>
 
                 <main className="w-full max-w-4xl mx-auto flex-grow">
