@@ -29,7 +29,15 @@ export default function App() {
                 snack_cantidad_1: { label: "1 pieza", percentage: 0, next: "snack_duracion" },
                 snack_cantidad_2: { label: "2 piezas", percentage: 0.8, next: "snack_entrega" },
                 snack_cantidad_3: { label: "3 piezas", percentage: 0.7, next: "snack_entrega" },
-                snack_cantidad_custom: { label: "Otra cantidad:", isCustom: true, percentage_per_item: 0.6, next: "snack_duracion" }
+                snack_cantidad_custom: { label: "Otra cantidad:", isCustom: true, percentage_per_item: 0.6, next: "snack_entrega" }
+            }
+        },
+        snack_entrega: {
+            question: "Formato de entrega",
+            type: 'radio',
+            options: {
+                snack_entrega_una: { label: "Todas de una", percentage: 0, next: "snack_duracion" },
+                snack_entrega_periodos: { label: "Por períodos (ej: 1 x semana)", percentage: 0.03, next: "snack_duracion" }
             }
         },
         snack_duracion: {
@@ -157,8 +165,16 @@ export default function App() {
             question: "Guión creativo",
             type: 'radio',
             options: {
-                guion_creativo_si: { label: "Con guión creativo", percentage: 0.1, next: "end" },
+                guion_creativo_si: { label: "Con guión creativo", percentage: 0.1, next: "concepto_creativo" },
                 guion_creativo_no: { label: "Sin guión creativo", percentage: 0, next: "end" }
+            }
+        },
+        concepto_creativo: {
+            question: "Concepto creativo",
+            type: 'radio',
+            options: {
+                concepto_creativo_si: { label: "Con concepto creativo", percentage: 0.03, next: "end" },
+                concepto_creativo_no: { label: "Sin concepto creativo", percentage: 0, next: "end" }
             }
         },
         end: {
