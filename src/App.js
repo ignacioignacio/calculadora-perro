@@ -31,7 +31,7 @@ export default function App() {
     // --- FLOW CONFIGURATION ---
     const budgetFlow = {
         start: {
-            question: "¡Hola Euge!\nElegí un tipo de contenido audiovisual",
+            question: "¡Hola Perro!\nElegí un tipo de contenido audiovisual",
             type: 'radio',
             options: {
                 snack: { label: "Snack Content", description: "Ideas para mostrar producto/servicios, situaciones de consumo/uso y contar novedades. De producción rápida, edición simple y vida corta.", next: "snack_cantidad" },
