@@ -34,8 +34,8 @@ export default function App() {
             question: "¡Hola Perro!\nElegí un tipo de contenido audiovisual",
             type: 'radio',
             options: {
-                snack: { label: "Snack Content", description: "Ideas para mostrar producto/servicios, situaciones de consumo/uso y contar novedades. De producción rápida, edición simple y vida corta.", next: "snack_cantidad" },
-                storytelling: { label: "Storytelling", description: "Ideal para contar historias y construir marca. Mayor vida útil. Puede incluir lipsync, escenarios reales, y gestos generado a partir de actuaciones reales. Solo RRSS.", next: "story_duracion" }
+                snack: { label: "Snack Content", description: "Pieza de contenido breve y de consumo rápido, optimizada para captar la atención y generar interacción inmediata. Su objetivo principal es mantener la frecuencia de contacto y reforzar el vínculo con la audiencia a través de estímulos de alta rotación y bajo tiempo de producción.", next: "snack_cantidad" },
+                storytelling: { label: "Hero Storytelling Digital", description: "Contenido de alto valor estratégico y producción más elaborada. De narrativa más desarrollada, música y voces enfocadas a contar mejor una historia y foco en generar desarrollar una historia para mejor recordación (más cercano a un clásico comercial de tele).", next: "story_duracion" }
             }
         },
         snack_cantidad: {
@@ -335,39 +335,39 @@ export default function App() {
                         )}
 
                         {currentStep && currentStep.isFinal && (
-                             <div className="text-left animate-fade-in">
-                                 <h2 className="text-xl sm:text-2xl text-left">Resumen</h2>
-                                 <hr className="border-t border-[#2a378d]/50 my-6" />
-                                 <div className="space-y-1 text-lg">
-                                     {path.filter(p => !budgetFlow[p.stepId].options[p.selection].label.startsWith("Sin ")).map((p, index) => {
-                                         const optionInfo = budgetFlow[p.stepId].options[p.selection];
-                                         if (!optionInfo) return null;
-                                         let label = optionInfo.label;
-                                         if (optionInfo.isCustom && p.value) {
-                                             label = `${p.value} piezas`;
-                                         }
-                                         const isFirst = p.stepId === 'start';
+                               <div className="text-left animate-fade-in">
+                                    <h2 className="text-xl sm:text-2xl text-left">Resumen</h2>
+                                    <hr className="border-t border-[#2a378d]/50 my-6" />
+                                    <div className="space-y-1 text-lg">
+                                        {path.filter(p => !budgetFlow[p.stepId].options[p.selection].label.startsWith("Sin ")).map((p, index) => {
+                                            const optionInfo = budgetFlow[p.stepId].options[p.selection];
+                                            if (!optionInfo) return null;
+                                            let label = optionInfo.label;
+                                            if (optionInfo.isCustom && p.value) {
+                                                label = `${p.value} piezas`;
+                                            }
+                                            const isFirst = p.stepId === 'start';
 
-                                         if (isFirst) {
+                                            if (isFirst) {
+                                                return (
+                                                    <p key={index} className="w-full text-left p-2 font-bold">
+                                                        {label}
+                                                    </p>
+                                                );
+                                            }
+
                                             return (
-                                                <p key={index} className="w-full text-left p-2 font-bold">
+                                                <button 
+                                                    key={index}
+                                                    onClick={() => handleJumpToStep(p.stepId, true)}
+                                                    className="w-full text-left p-2 rounded-md transition-colors hover:bg-[#2a378d]/10"
+                                                >
                                                     {label}
-                                                </p>
+                                                </button>
                                             );
-                                         }
-
-                                         return (
-                                            <button 
-                                                key={index}
-                                                onClick={() => handleJumpToStep(p.stepId, true)}
-                                                className="w-full text-left p-2 rounded-md transition-colors hover:bg-[#2a378d]/10"
-                                            >
-                                                {label}
-                                            </button>
-                                         );
-                                     })}
-                                 </div>
-                             </div>
+                                        })}
+                                    </div>
+                               </div>
                         )}
                     </div>
                 </main>
@@ -376,66 +376,66 @@ export default function App() {
                      <div className="w-full">
                          {path.length > 0 && (
                              <>
-                                {currentStep && currentStep.isFinal && (
-                                    <div className="mb-8">
-                                        {(() => {
-                                            const excludedSteps = path
-                                                .filter(p => {
-                                                    const option = budgetFlow[p.stepId]?.options[p.selection];
-                                                    return option && option.label.startsWith("Sin ");
-                                                })
-                                                .map(p => {
-                                                    const option = budgetFlow[p.stepId].options[p.selection];
-                                                    const cleanLabel = option.label.substring(4);
-                                                    return {
-                                                        stepId: p.stepId,
-                                                        label: cleanLabel.charAt(0).toUpperCase() + cleanLabel.slice(1)
-                                                    };
-                                                });
+                                 {currentStep && currentStep.isFinal && (
+                                     <div className="mb-8">
+                                         {(() => {
+                                             const excludedSteps = path
+                                                 .filter(p => {
+                                                     const option = budgetFlow[p.stepId]?.options[p.selection];
+                                                     return option && option.label.startsWith("Sin ");
+                                                 })
+                                                 .map(p => {
+                                                     const option = budgetFlow[p.stepId].options[p.selection];
+                                                     const cleanLabel = option.label.substring(4);
+                                                     return {
+                                                         stepId: p.stepId,
+                                                         label: cleanLabel.charAt(0).toUpperCase() + cleanLabel.slice(1)
+                                                     };
+                                                 });
 
-                                            if (excludedSteps.length > 0) {
-                                                return (
-                                                    <div className="text-base mt-8">
-                                                        <p className="mb-2">No incluye:</p>
-                                                        <div className="space-y-1">
-                                                            {excludedSteps.map(step => (
-                                                                <button
-                                                                    key={step.stepId}
-                                                                    onClick={() => handleJumpToStep(step.stepId, true)}
-                                                                    className="w-full text-left p-2 rounded-md transition-colors hover:bg-[#2a378d]/10"
-                                                                >
-                                                                    {step.label}
-                                                                </button>
-                                                            ))}
-                                                        </div>
-                                                    </div>
-                                                );
-                                            }
-                                            return null;
-                                        })()}
-                                        <p className="italic mt-8 text-xs text-[#2a378d]">
-                                            Recordá que éste es un presupuesto estimativo. Sirve como referencia rápida para tomar decisiones. Válido sólo para piezas en RRSS. Para TV u otros medios, consultá por un presupuesto personalizado.
-                                        </p>
-                                    </div>
-                                )}
-                                 <hr className="border-t border-[#2a378d]/50" />
-                                 <div className="flex justify-between items-center py-4">
-                                     <div className="flex-1 text-left">
-                                         <span className="text-lg sm:text-xl">
+                                             if (excludedSteps.length > 0) {
+                                                 return (
+                                                     <div className="text-base mt-8">
+                                                         <p className="mb-2">No incluye:</p>
+                                                         <div className="space-y-1">
+                                                             {excludedSteps.map(step => (
+                                                                 <button
+                                                                     key={step.stepId}
+                                                                     onClick={() => handleJumpToStep(step.stepId, true)}
+                                                                     className="w-full text-left p-2 rounded-md transition-colors hover:bg-[#2a378d]/10"
+                                                                 >
+                                                                     {step.label}
+                                                                 </button>
+                                                             ))}
+                                                         </div>
+                                                     </div>
+                                                 );
+                                             }
+                                             return null;
+                                         })()}
+                                         <p className="italic mt-8 text-xs text-[#2a378d]">
+                                             Recordá que éste es un presupuesto estimativo. Sirve como referencia rápida para tomar decisiones. Válido sólo para piezas en RRSS. Para TV u otros medios, consultá por un presupuesto personalizado.
+                                         </p>
+                                     </div>
+                                 )}
+                                  <hr className="border-t border-[#2a378d]/50" />
+                                  <div className="flex justify-between items-center py-4">
+                                      <div className="flex-1 text-left">
+                                          <span className="text-lg sm:text-xl">
                                              {currentStep && currentStep.isFinal ? "Total Final" : "Total Parcial"}
-                                         </span>
-                                     </div>
-                                     <div className="flex-1 text-center">
-                                         <span className="text-xl sm:text-2xl text-[#2a378d] font-bold">
+                                          </span>
+                                      </div>
+                                      <div className="flex-1 text-center">
+                                          <span className="text-xl sm:text-2xl text-[#2a378d] font-bold">
                                              ${new Intl.NumberFormat('es-AR').format(totalPrice)}
-                                         </span>
-                                     </div>
-                                     <div className="flex-1 text-right">
-                                         <button onClick={handleReset} className="text-[#2a378d] text-sm hover:bg-[#2a378d]/10 border border-[#2a378d] rounded-full px-4 py-1 transition-colors">
-                                             Reiniciar
-                                         </button>
-                                     </div>
-                                 </div>
+                                          </span>
+                                      </div>
+                                      <div className="flex-1 text-right">
+                                          <button onClick={handleReset} className="text-[#2a378d] text-sm hover:bg-[#2a378d]/10 border border-[#2a378d] rounded-full px-4 py-1 transition-colors">
+                                              Reiniciar
+                                          </button>
+                                      </div>
+                                  </div>
                              </>
                          )}
                          <hr className="border-t border-[#2a378d]/50" />
